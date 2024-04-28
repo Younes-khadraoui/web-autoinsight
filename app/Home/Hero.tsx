@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -12,11 +13,11 @@ const Hero = () => {
         easier, using LLMs.
       </p>
       <div className="flex gap-10 font-medium">
-        <button className="bg-white px-16 py-4 text-black rounded-3xl border-2 border-white">
-          Get Started
+        <button className="bg-white px-16 py-4 text-black rounded-full border-2 border-white">
+          <Link href="/docs/getting-started">Get Started</Link>
         </button>
-        <button className="px-16 py-4 rounded-3xl border-2 border-white">
-          Get Started
+        <button className="px-16 py-4 rounded-full border-2 border-white">
+          <Link href="/playground">Playground</Link>
         </button>
       </div>
     </div>
