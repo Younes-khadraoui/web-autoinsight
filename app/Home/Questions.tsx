@@ -1,6 +1,12 @@
-"use client";
 import React from "react";
 import { useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface card {
   question: string;
@@ -24,41 +30,31 @@ const cards: card[] = [
 ];
 
 const Questions = () => {
-  const [index, setIndex] = useState(0);
-
   return (
     <div className="p-10 pb-20 lg:p-56 lg:pt-10">
       <p className="font-bold text-5xl pb-10 text-center">
         Frequently asked <br />
         Questions ?
       </p>
-      <div className="flex gap-10 lg:px-36">
-        <div className="flex justify-center items-center">
-          <button
-            className="p-6 px-8 border-4 rounded-[50%] font-bold text-2xl"
-            onClick={() => {
-              if (index === 0) setIndex(cards.length - 1);
-              else setIndex(index - 1);
-            }}
-          >
-            &lt;
-          </button>
-        </div>
-        <div className="p-10 pb-20 border-4 bg-second rounded-3xl flex-1">
-          <p className="font-semibold text-xl pb-2">{cards[index].question}</p>
-          <p className="text-lg">{cards[index].answer}</p>
-        </div>
-        <div className="flex justify-center items-center">
-          <button
-            className="p-6 px-8 border-4 rounded-[50%] font-bold text-2xl"
-            onClick={() => {
-              if (index === cards.length - 1) setIndex(0);
-              else setIndex(index + 1);
-            }}
-          >
-            &gt;
-          </button>
-        </div>
+      <div className="px-32">
+        <Carousel
+          className="bg-second px-10 py-20 rounded-2xl border-4"
+          opts={{
+            loop: true,
+            align: "center",
+          }}
+        >
+          <CarouselContent>
+            {cards.map((card, index) => (
+              <CarouselItem key={index}>
+                <p className="font-bold text-2xl pb-2">{card.question}</p>
+                <p className="text-lg">{cards[index].answer}</p>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="text-black" />
+          <CarouselNext className="text-black" />
+        </Carousel>
       </div>
     </div>
   );
