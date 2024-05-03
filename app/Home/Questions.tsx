@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -38,7 +37,7 @@ const Questions = () => {
       </p>
       <div className="px-32">
         <Carousel
-          className="bg-second px-10 py-20 rounded-2xl border-4"
+          className="bg-second px-10 py-20 rounded-2xl"
           opts={{
             loop: true,
             align: "center",
@@ -52,8 +51,8 @@ const Questions = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="text-black" />
-          <CarouselNext className="text-black" />
+          <CarouselPrevious className="bg-second border-none" />
+          <CarouselNext className="bg-black border-none bg-second" />
         </Carousel>
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useReportStore } from "@/store/report";
 
 const items = [
   {
@@ -44,7 +45,11 @@ const items = [
 
 export function Operations() {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+
+  const { operation, setOperation } = useReportStore();
+  React.useEffect(() => {
+    setOperation(operation);
+  }, [operation]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -55,8 +60,8 @@ export function Operations() {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {value
-            ? items.find((item) => item.value === value)?.label
+          {operation
+            ? items.find((item) => item.value === operation)?.label
             : "Select operation..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -72,14 +77,16 @@ export function Operations() {
                   key={item.value}
                   value={item.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    setOperation(
+                      currentValue === operation ? "" : currentValue
+                    );
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === item.value ? "opacity-100" : "opacity-0"
+                      operation === item.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {item.label}
