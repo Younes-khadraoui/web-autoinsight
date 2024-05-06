@@ -30,8 +30,8 @@ const items = [
     label: "Correlation",
   },
   {
-    value: "groupby",
-    label: "Groupby",
+    value: "descreptif",
+    label: "Descreptif",
   },
   {
     value: "classification",
