@@ -1,0 +1,6 @@
+autoinsight==0.1.0
+fastapi==0.111.0
+langchain_google_genai==1.0.3
+pandas==2.2.2
+pydantic==2.7.1
+python-dotenv==1.0.1

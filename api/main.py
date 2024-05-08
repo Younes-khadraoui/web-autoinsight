@@ -12,13 +12,28 @@ from autoinsight.analysis.operation_analysis import (
 )
 from pydantic import ValidationError
 from dotenv import load_dotenv
-from autoinsight.operations.eda import DescriptiveStatistics
+
+# importing operations
+from autoinsight.operations.factorial_analysis import (
+    Correspondence_Analysis,
+    FAMD_analysis,
+    MCAnalysis,
+    MFAnalysis,
+    PCAnalysis,
+)
+from autoinsight.operations.eda import (
+    DescriptiveStatistics,
+    CategoricalGroupBy,
+    EmptyCells,
+)
+from autoinsight.operations.classification import Classification
+from autoinsight.operations.regression import Regression
+from autoinsight.operations.ml import CorrelationMatrix, SpearmanCorrelationMatrix
+from autoinsight.operations.multivariate import CCAnalysis, Kmeans
 
 app = FastAPI()
 
 load_dotenv()
-
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 @app.post("/generate-conclusion")
@@ -34,6 +49,9 @@ async def generate_conclusion(
             f.write(contents)
 
         data = pd.read_csv(uploadedFile.filename)
+
+        print(data.head())
+
         column_description = {
             "gender": "gender of the student,",
             "race/ethnicity": "the racial or ethnic background of the student",
@@ -49,7 +67,7 @@ async def generate_conclusion(
                         insights into the students' backgrounds and potential influencing factors."""
         llm = ChatGoogleGenerativeAI(
             model="gemini-pro",
-            google_api_key=os.getenv("OPENAI_KEY"),
+            google_api_key=os.getenv("GOOGLE_API_KEY"),
         )
         dataset_descr = BaseDataset(
             columns_description=column_description,
@@ -73,7 +91,7 @@ async def generate_conclusion(
             llm=llm,
         )
 
-        return JSONResponse(content={"conclusion": conclsion})
+        return JSONResponse(content={"conclusion": conclsion, "response": response})
     except ValidationError as e:
         return JSONResponse(content={"detail": str(e)}, status_code=422)
     except Exception as e:

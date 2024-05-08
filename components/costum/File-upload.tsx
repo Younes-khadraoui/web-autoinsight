@@ -18,7 +18,7 @@ const FileUpload = () => {
           File upload
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] text-black'">
+      <DialogContent className="sm:max-w-[425px] text-black">
         <DialogHeader>
           <DialogTitle className="text-center text-black">
             Upload your Dataset

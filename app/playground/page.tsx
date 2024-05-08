@@ -7,10 +7,12 @@ import axios from "axios";
 import FileUpload from "@/components/costum/File-upload";
 import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/store/report";
+import ReactMarkdown from "react-markdown";
 
 const Playground = () => {
   const state = useReportStore();
   const [conclusion, setConclusion] = React.useState<string | null>(null);
+  const [response, setResponse] = React.useState<string | null>(null);
   const [prompt, setPrompt] = React.useState<string>("");
 
   const handleSubmit = async (event: any) => {
@@ -33,6 +35,7 @@ const Playground = () => {
         }
       );
       setConclusion(response.data.conclusion);
+      setResponse(response.data.response);
     } catch (error) {
       console.error("Error generating conclusion:", error);
     }
@@ -46,12 +49,10 @@ const Playground = () => {
           className="text-black flex flex-col gap-10"
           onSubmit={handleSubmit}
         >
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-[200px]">
             <FileUpload />
             {state.uploadedFile && (
-              <p className="text-white">
-                Uploaded file: {state.uploadedFile.name}
-              </p>
+              <p className="text-white">{state.uploadedFile.name}</p>
             )}
           </div>
           <Operations />
@@ -70,9 +71,14 @@ const Playground = () => {
       <div className="bg-second p-5 min-h-screen flex-1">
         <p className="font-bold text-3xl pb-6">The report</p>
         <p className="text-xl"></p>
+        {response && (
+          <div className="mt-4">
+            <ReactMarkdown>{response}</ReactMarkdown>
+          </div>
+        )}
         {conclusion && (
           <div className="mt-4">
-            <p>{conclusion}</p>
+            <ReactMarkdown>{conclusion}</ReactMarkdown>
           </div>
         )}
       </div>
