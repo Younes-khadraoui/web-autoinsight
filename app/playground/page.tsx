@@ -2,21 +2,24 @@
 
 import { Operations } from "@/components/costum/Operations";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import FileUpload from "@/components/costum/File-upload";
 import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/store/report";
 import ReactMarkdown from "react-markdown";
+import { PacmanLoader } from "react-spinners";
 
 const Playground = () => {
   const state = useReportStore();
-  const [conclusion, setConclusion] = React.useState<string | null>(null);
-  const [response, setResponse] = React.useState<string | null>(null);
-  const [prompt, setPrompt] = React.useState<string>("");
+  const [conclusion, setConclusion] = useState<string | null>(null);
+  const [response, setResponse] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("operation", state.operation);
@@ -38,6 +41,8 @@ const Playground = () => {
       setResponse(response.data.response);
     } catch (error) {
       console.error("Error generating conclusion:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,15 +76,21 @@ const Playground = () => {
       <div className="bg-second p-5 min-h-screen flex-1">
         <p className="font-bold text-3xl pb-6">The report</p>
         <p className="text-xl"></p>
-        {response && (
-          <div className="mt-4">
-            <ReactMarkdown>{response}</ReactMarkdown>
-          </div>
-        )}
-        {conclusion && (
-          <div className="mt-4">
-            <ReactMarkdown>{conclusion}</ReactMarkdown>
-          </div>
+        {loading ? (
+          <PacmanLoader color="white" />
+        ) : (
+          <React.Fragment>
+            {response && (
+              <div className="mt-4">
+                <ReactMarkdown>{response}</ReactMarkdown>
+              </div>
+            )}
+            {conclusion && (
+              <div className="mt-4">
+                <ReactMarkdown>{conclusion}</ReactMarkdown>
+              </div>
+            )}
+          </React.Fragment>
         )}
       </div>
     </div>

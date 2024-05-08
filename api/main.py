@@ -65,10 +65,12 @@ async def generate_conclusion(
         data_description = """This data set consists of the marks secured by the students in various subjects.
                        a Alongside academic scores, the dataset includes additional attributes that offer
                         insights into the students' backgrounds and potential influencing factors."""
+
         llm = ChatGoogleGenerativeAI(
             model="gemini-pro",
             google_api_key=os.getenv("GOOGLE_API_KEY"),
         )
+
         dataset_descr = BaseDataset(
             columns_description=column_description,
             data=data,
@@ -95,6 +97,7 @@ async def generate_conclusion(
     except ValidationError as e:
         return JSONResponse(content={"detail": str(e)}, status_code=422)
     except Exception as e:
+        print(str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
