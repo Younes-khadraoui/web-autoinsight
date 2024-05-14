@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 import pandas as pd
 import os
+import io
 from autoinsight.dataset.basic import BaseDataset
 from langchain_google_genai import ChatGoogleGenerativeAI
 from autoinsight.analysis.operation_analysis import (
@@ -45,10 +46,9 @@ async def generate_conclusion(
 ):
     try:
         contents = await uploadedFile.read()
-        with open(uploadedFile.filename, "wb") as f:
-            f.write(contents)
+        file_like = io.BytesIO(contents)
 
-        data = pd.read_csv(uploadedFile.filename)
+        data = pd.read_csv(file_like)
 
         print(data.head())
 
@@ -75,7 +75,7 @@ async def generate_conclusion(
             columns_description=column_description,
             data=data,
             description=data_description,
-            name="Student Performance datasets",
+            name=uploadedFile.filename,
         )
 
         operation = DescriptiveStatistics(data=data)
