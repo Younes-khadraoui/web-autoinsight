@@ -9,13 +9,40 @@ import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/store/report";
 import ReactMarkdown from "react-markdown";
 import { PacmanLoader } from "react-spinners";
+import { Textarea } from "@/components/ui/textarea";
+import Papa from "papaparse";
 
 const Playground = () => {
   const state = useReportStore();
   const [conclusion, setConclusion] = useState<string | null>(null);
   const [response, setResponse] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<string>("");
+  const [dataDescription, setDataDescription] = useState<string>("");
+  const [columnDescriptions, setColumnDescriptions] = useState<{
+    [key: string]: string;
+  }>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const [columns, setColumns] = useState<string[]>([]);
+
+  const handleFileChange = (file: File) => {
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: (results: any) => {
+          const columnHeaders = results.meta.fields || [];
+          setColumns(columnHeaders);
+          const initialDescriptions = columnHeaders.reduce(
+            (acc: any, column: any) => {
+              acc[column] = "";
+              return acc;
+            },
+            {} as { [key: string]: string }
+          );
+          setColumnDescriptions(initialDescriptions);
+        },
+      });
+    }
+  };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -27,6 +54,10 @@ const Playground = () => {
         formData.append("uploadedFile", state.uploadedFile);
       }
       formData.append("prompt", prompt);
+      formData.append("dataDescription", dataDescription);
+      formData.append("columnDescriptions", JSON.stringify(columnDescriptions));
+      console.log("columnDescriptions", JSON.stringify(columnDescriptions));
+      console.log("operation", state.operation);
 
       const response = await axios.post(
         "http://localhost:8000/generate-conclusion",
@@ -55,20 +86,61 @@ const Playground = () => {
           onSubmit={handleSubmit}
         >
           <div className="flex flex-col gap-2 w-[200px]">
-            <FileUpload />
+            <FileUpload onFileUpload={handleFileChange} />
             {state.uploadedFile && (
               <p className="text-white">{state.uploadedFile.name}</p>
             )}
           </div>
+          {state.uploadedFile && (
+            <>
+              <div>
+                <label className="text-white font-bold">
+                  Describe the data
+                </label>
+                <Textarea
+                  className="w-[200px] mt-2"
+                  placeholder="Describe the data"
+                  name="data-description"
+                  value={dataDescription}
+                  onChange={(e) => setDataDescription(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-white font-bold">
+                  Describe the columns
+                </label>
+                {columns.map((column) => (
+                  <div key={column} className="mt-2">
+                    <label className="text-white">{column} :</label>
+                    <Textarea
+                      className="w-[200px] mt-1"
+                      placeholder={`Description for ${column}`}
+                      name={`description-${column}`}
+                      value={columnDescriptions[column]}
+                      onChange={(e) =>
+                        setColumnDescriptions({
+                          ...columnDescriptions,
+                          [column]: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
           <Operations />
-          <Input
-            className="w-[200px]"
-            placeholder="Change the prompt"
-            name="prompt"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-          />
-          <Button className="bg-red-500" type="submit">
+          <div>
+            <label className="text-white font-bold">Prompt (optional)</label>
+            <Input
+              className="w-[200px] mt-2"
+              placeholder="Change the prompt"
+              name="prompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+          </div>
+          <Button className="bg-red-500 w-[200px]" type="submit">
             Generate Conclusion
           </Button>
         </form>

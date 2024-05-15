@@ -6,8 +6,9 @@ import { useDropzone } from "react-dropzone";
 import { Input } from "../ui/input";
 import { useReportStore } from "@/store/report";
 
-export default function CSVUpload() {
+export default function CSVUpload({ onFileUpload }: any) {
   const { uploadedFile, setUploadedFile } = useReportStore();
+
   useEffect(() => {
     setUploadedFile(uploadedFile);
   }, [uploadedFile]);
@@ -18,6 +19,9 @@ export default function CSVUpload() {
     );
     if (csvFile) {
       setUploadedFile(csvFile);
+      if (onFileUpload) {
+        onFileUpload(csvFile);
+      }
     }
   }, []);
 

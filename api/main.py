@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from typing import Optional
 
 import pandas as pd
 import os
 import io
+import json
 from autoinsight.dataset.basic import BaseDataset
 from langchain_google_genai import ChatGoogleGenerativeAI
 from autoinsight.analysis.operation_analysis import (
@@ -41,10 +43,15 @@ load_dotenv()
 async def generate_conclusion(
     req: Request,
     operation: str = Form(...),
-    prompt: str = Form(...),
+    prompt: Optional[str] = Form(None),
+    dataDescription: str = Form(...),
+    columnDescriptions: str = Form(...),
     uploadedFile: UploadFile = Form(...),
 ):
     try:
+        print(f"Data Description: {dataDescription}")
+        print(f"Column Descriptions: {columnDescriptions}")
+
         contents = await uploadedFile.read()
         file_like = io.BytesIO(contents)
 
@@ -52,19 +59,9 @@ async def generate_conclusion(
 
         print(data.head())
 
-        column_description = {
-            "gender": "gender of the student,",
-            "race/ethnicity": "the racial or ethnic background of the student",
-            "parental level of education": "the highest level of education attained by the student's parents or guardians",
-            "lunch": "type of lunch received by the student",
-            "test preparation course": "Specifies whether the student completed a test preparation course",
-            "math score": "the score achieved by the student on a math exam",
-            "reading score": "the score achieved by the student on a reading exam",
-            "writing score": " the score achieved by the student on a writing exam",
-        }
-        data_description = """This data set consists of the marks secured by the students in various subjects.
-                       a Alongside academic scores, the dataset includes additional attributes that offer
-                        insights into the students' backgrounds and potential influencing factors."""
+        column_description = json.loads(columnDescriptions)
+
+        data_description = dataDescription
 
         llm = ChatGoogleGenerativeAI(
             model="gemini-pro",
@@ -77,8 +74,11 @@ async def generate_conclusion(
             description=data_description,
             name=uploadedFile.filename,
         )
+        if operation == "descreptif":
+            operation = DescriptiveStatistics(data=data)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid operation type")
 
-        operation = DescriptiveStatistics(data=data)
         operation.run_operation()
 
         response = analyze_single_operation(
@@ -108,3 +108,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+"""This data set consists of the marks secured by the students in various subjects.
+                       a Alongside academic scores, the dataset includes additional attributes that offer
+                        insights into the students' backgrounds and potential influencing factors."""
+
+#   "gender": "gender of the student,",
+#     "race/ethnicity": "the racial or ethnic background of the student",
+#     "parental level of education": "the highest level of education attained by the student's parents or guardians",
+#     "lunch": "type of lunch received by the student",
+#     "test preparation course": "Specifies whether the student completed a test preparation course",
+#     "math score": "the score achieved by the student on a math exam",
+#     "reading score": "the score achieved by the student on a reading exam",
+#     "writing score": " the score achieved by the student on a writing exam",

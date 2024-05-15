@@ -10,7 +10,7 @@ import {
 import CSVUpload from "@/components/costum/csv-upload";
 import { Button } from "@/components/ui/button";
 
-const FileUpload = () => {
+const FileUpload = ({ onFileUpload }: any) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -28,7 +28,7 @@ const FileUpload = () => {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <CSVUpload />
+          <CSVUpload onFileUpload={onFileUpload} />
         </div>
       </DialogContent>
     </Dialog>
