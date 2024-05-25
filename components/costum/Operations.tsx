@@ -22,24 +22,24 @@ import { useReportStore } from "@/store/report";
 
 const items = [
   {
-    value: "kmeans",
-    label: "Kmeans",
-  },
-  {
-    value: "correration",
-    label: "Correlation",
+    value: "PCAnalysis",
+    label: "PCA",
   },
   {
     value: "descreptif",
     label: "Descreptif",
   },
   {
-    value: "classification",
-    label: "Classification",
+    value: "MCAnalysis",
+    label: "MCA",
   },
   {
-    value: "regression",
-    label: "Regression",
+    value: "CorrelationMatrix",
+    label: "Correlation Matrix",
+  },
+  {
+    value: "SpearmanCorrelationMatrix",
+    label: "Spearman Correlation Matrix",
   },
 ];
 

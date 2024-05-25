@@ -49,9 +49,6 @@ async def generate_conclusion(
     uploadedFile: UploadFile = Form(...),
 ):
     try:
-        print(f"Data Description: {dataDescription}")
-        print(f"Column Descriptions: {columnDescriptions}")
-
         contents = await uploadedFile.read()
         file_like = io.BytesIO(contents)
 
@@ -74,9 +71,17 @@ async def generate_conclusion(
             description=data_description,
             name=uploadedFile.filename,
         )
-        if operation == "descreptif":
-            operation = DescriptiveStatistics(data=data)
-        else:
+
+        operation_classes = {
+            "descreptif": DescriptiveStatistics,
+            "PCAnalysis": PCAnalysis,
+            "MCAnalysis": MCAnalysis,
+            "CorrelationMatrix": CorrelationMatrix,
+        }
+
+        try:
+            operation = operation_classes[operation](data=data)
+        except KeyError:
             raise HTTPException(status_code=400, detail="Invalid operation type")
 
         operation.run_operation()
@@ -108,17 +113,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-"""This data set consists of the marks secured by the students in various subjects.
-                       a Alongside academic scores, the dataset includes additional attributes that offer
-                        insights into the students' backgrounds and potential influencing factors."""
-
-#   "gender": "gender of the student,",
-#     "race/ethnicity": "the racial or ethnic background of the student",
-#     "parental level of education": "the highest level of education attained by the student's parents or guardians",
-#     "lunch": "type of lunch received by the student",
-#     "test preparation course": "Specifies whether the student completed a test preparation course",
-#     "math score": "the score achieved by the student on a math exam",
-#     "reading score": "the score achieved by the student on a reading exam",
-#     "writing score": " the score achieved by the student on a writing exam",
