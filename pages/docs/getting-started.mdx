@@ -1,3 +1,63 @@
 # Welcome to Autoinsight
 
-Hello, world!
+This package is designed to make data analysis easier for data analysts by automating the process using large language models (LLMs).
+
+## Installation
+
+To install the AutoInsight package, use the following command:
+
+```bash
+pip install autoinsight
+```
+
+## Features
+
+- **Automated Data Analysis:** Perform comprehensive data analysis with just a few commands.
+- **Insight Generation:** Automatically generate insights and summaries from your data.
+- **Report Creation:** Create detailed and customizable reports based on your analysis.
+
+## Quick Start
+
+```python
+from autoinsight.analysis.operation_analysis import analyze_single_operation,
+from autoinsight.operations as choosed_operation
+import pandas as pd
+
+# Load your dataset
+data = pd.read_csv('your_dataset.csv')
+
+# Apply the operation
+operation = choosed_operation(data)
+operation.run_operation()
+
+# Describe the dataset and columns
+data_description = "This dataset contains information about..."
+column_description = "The column 'column_name' represents..."
+
+# Analyze the operation
+llm = ChatGoogleGenerativeAI(
+    model="gemini-pro",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+)
+dataset_descr = BaseDataset(
+    columns_description=column_description,
+    data=data,
+    description=data_description,
+    name=uploadedFile.filename,
+)
+
+# Generate insights
+response = analyze_single_operation(
+    operation=operation,
+    dataset=dataset_descr,
+    llm=llm,
+)
+conclsion = conclusion_generation(
+    operation_analysis=response,
+    dataset=dataset_descr,
+    llm=llm,
+)
+
+# Print the insights
+print(conclusion)
+```

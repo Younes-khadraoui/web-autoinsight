@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import CSVUpload from "@/components/costum/csv-upload";
+import CSVUpload from "@/components/playground/csv-upload";
 import { Button } from "@/components/ui/button";
 
 const FileUpload = ({ onFileUpload }: any) => {

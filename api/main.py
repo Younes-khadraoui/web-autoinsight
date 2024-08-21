@@ -9,6 +9,7 @@ import io
 import json
 from autoinsight.dataset.basic import BaseDataset
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from autoinsight.analysis.operation_analysis import (
     analyze_single_operation,
     conclusion_generation,
@@ -65,6 +66,11 @@ async def generate_conclusion(
             google_api_key=os.getenv("GOOGLE_API_KEY"),
         )
 
+        # llm = ChatOpenAI(
+        #     model="gpt-4-turbo",
+        #     openai_api_key=os.getenv("OPENAI_KEY"),
+        # )
+
         dataset_descr = BaseDataset(
             columns_description=column_description,
             data=data,
@@ -85,6 +91,11 @@ async def generate_conclusion(
             raise HTTPException(status_code=400, detail="Invalid operation type")
 
         operation.run_operation()
+
+        if prompt:
+            operation.prompt = prompt + "\n\n" + operation.prompt
+
+        print(operation.prompt)
 
         response = analyze_single_operation(
             operation=operation,

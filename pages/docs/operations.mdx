@@ -1,3 +1,29 @@
-# meow meow
+# Operations & Algorithms
 
-meow meow
+
+## Exploratory Data Analysis (EDA) Operations
+
+### Descriptive Statistics
+
+Generate descriptive statistics to understand the basic features of your dataset.
+
+```python
+import autoinsight as ai
+
+# Load your dataset
+data = ai.load_data('your_dataset.csv')
+
+# Generate descriptive statistics
+descriptive_stats = ai.eda.descriptive(data)
+print(descriptive_stats)
+
+```
+
+### Group By
+```python
+# Perform group by operation
+grouped_data = ai.eda.groupby(data, by='column_name')
+print(grouped_data)
+
+```
+

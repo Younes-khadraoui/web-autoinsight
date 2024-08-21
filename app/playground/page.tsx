@@ -1,16 +1,17 @@
+// pages/Playground.tsx
 "use client";
 
-import { Operations } from "@/components/costum/Operations";
+import { Operations } from "@/components/playground/Operations";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import axios from "axios";
-import FileUpload from "@/components/costum/File-upload";
-import { Input } from "@/components/ui/input";
 import { useReportStore } from "@/store/report";
-import ReactMarkdown from "react-markdown";
-import { PacmanLoader } from "react-spinners";
-import { Textarea } from "@/components/ui/textarea";
-import Papa from "papaparse";
+import FileUploadComponent from "@/components/playground/FileUploadComponent";
+import DataDescriptionComponent from "@/components/playground/DataDescriptionComponent";
+import ColumnDescriptionsComponent from "@/components/playground/ColumnDescriptionsComponent";
+import PromptComponent from "@/components/playground/PromptComponent";
+import ReportComponent from "@/components/playground/ReportComponent";
+import { handleFileChange } from "@/utils/fileUtils";
 
 const Playground = () => {
   const state = useReportStore();
@@ -24,24 +25,11 @@ const Playground = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [columns, setColumns] = useState<string[]>([]);
 
-  const handleFileChange = (file: File) => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        complete: (results: any) => {
-          const columnHeaders = results.meta.fields || [];
-          setColumns(columnHeaders);
-          const initialDescriptions = columnHeaders.reduce(
-            (acc: any, column: any) => {
-              acc[column] = "";
-              return acc;
-            },
-            {} as { [key: string]: string }
-          );
-          setColumnDescriptions(initialDescriptions);
-        },
-      });
-    }
+  const handleFileUpload = (file: File) => {
+    handleFileChange(file).then(({ columnHeaders, initialDescriptions }) => {
+      setColumns(columnHeaders);
+      setColumnDescriptions(initialDescriptions);
+    });
   };
 
   const handleSubmit = async (event: any) => {
@@ -56,8 +44,6 @@ const Playground = () => {
       formData.append("prompt", prompt);
       formData.append("dataDescription", dataDescription);
       formData.append("columnDescriptions", JSON.stringify(columnDescriptions));
-      console.log("columnDescriptions", JSON.stringify(columnDescriptions));
-      console.log("operation", state.operation);
 
       const response = await axios.post(
         "http://localhost:8000/generate-conclusion",
@@ -85,86 +71,35 @@ const Playground = () => {
           className="text-black flex flex-col gap-10"
           onSubmit={handleSubmit}
         >
-          <div className="flex flex-col gap-2 w-[200px]">
-            <FileUpload onFileUpload={handleFileChange} />
-            {state.uploadedFile && (
-              <p className="text-white">{state.uploadedFile.name}</p>
-            )}
-          </div>
+          <FileUploadComponent
+            onFileUpload={handleFileUpload}
+            uploadedFile={state.uploadedFile}
+          />
           {state.uploadedFile && (
             <>
-              <div>
-                <label className="text-white font-bold">
-                  Describe the data
-                </label>
-                <Textarea
-                  className="w-[200px] mt-2"
-                  placeholder="Describe the data"
-                  name="data-description"
-                  value={dataDescription}
-                  onChange={(e) => setDataDescription(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-white font-bold">
-                  Describe the columns
-                </label>
-                {columns.map((column) => (
-                  <div key={column} className="mt-2">
-                    <label className="text-white">{column} :</label>
-                    <Textarea
-                      className="w-[200px] mt-1"
-                      placeholder={`Description for ${column}`}
-                      name={`description-${column}`}
-                      value={columnDescriptions[column]}
-                      onChange={(e) =>
-                        setColumnDescriptions({
-                          ...columnDescriptions,
-                          [column]: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
+              <DataDescriptionComponent
+                dataDescription={dataDescription}
+                setDataDescription={setDataDescription}
+              />
+              <ColumnDescriptionsComponent
+                columns={columns}
+                columnDescriptions={columnDescriptions}
+                setColumnDescriptions={setColumnDescriptions}
+              />
             </>
           )}
           <Operations />
-          <div>
-            <label className="text-white font-bold">Prompt (optional)</label>
-            <Input
-              className="w-[200px] mt-2"
-              placeholder="Change the prompt"
-              name="prompt"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-          </div>
+          <PromptComponent prompt={prompt} setPrompt={setPrompt} />
           <Button className="bg-red-500 w-[200px]" type="submit">
             Generate Conclusion
           </Button>
         </form>
       </div>
-      <div className="bg-second p-5 min-h-screen flex-1">
-        <p className="font-bold text-3xl pb-6">The report</p>
-        <p className="text-xl"></p>
-        {loading ? (
-          <PacmanLoader color="white" />
-        ) : (
-          <React.Fragment>
-            {response && (
-              <div className="mt-4">
-                <ReactMarkdown>{response}</ReactMarkdown>
-              </div>
-            )}
-            {conclusion && (
-              <div className="mt-4">
-                <ReactMarkdown>{conclusion}</ReactMarkdown>
-              </div>
-            )}
-          </React.Fragment>
-        )}
-      </div>
+      <ReportComponent
+        loading={loading}
+        response={response}
+        conclusion={conclusion}
+      />
     </div>
   );
 };
